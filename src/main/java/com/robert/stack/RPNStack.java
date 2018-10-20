@@ -1,7 +1,6 @@
 package com.robert.stack;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Stack;
 
 import com.robert.Constant;
@@ -64,12 +63,15 @@ public class RPNStack implements Constant {
         } catch (RPNException e) {
             System.out.println(e.getMessage());
         }
-        System.out.println(Arrays.toString(base.toArray()));
-        System.out.print("stack: " );
+        print();
+    }
+
+    public void print() {
+        System.out.print("stack: ");
         show.forEach(number -> {
-            if (number.contains(POINT + "") && number.indexOf(POINT + "") + TEN <= number.length()){
+            if (number.contains(POINT + "") && number.indexOf(POINT + "") + TEN <= number.length()) {
                 System.out.print(new BigDecimal(number).setScale(SHOW_PRECISION, ROUNDING_MODE));
-            }else{
+            } else {
                 System.out.print(number);
             }
             System.out.print(SPACE);
@@ -85,7 +87,7 @@ public class RPNStack implements Constant {
                 case REDUCE:
                 case MULTIPLY:
                 case DIVIDE:
-                    this.operation();
+                    this.operationOrder();
                     break;
                 case ZERO:
                 case ONE:
@@ -98,16 +100,16 @@ public class RPNStack implements Constant {
                 case EIGHT:
                 case NINE:
                 case POINT:
-                    this.number();
+                    this.numberOrder();
                     break;
                 case CLEAR_START:
-                    this.clear();
+                    this.clearOrder();
                     break;
                 case UNDO_START:
-                    this.undo();
+                    this.undoOrder();
                     break;
                 case SQRT_START:
-                    this.sqrt();
+                    this.sqrtOrder();
                     break;
                 case SPACE:
                     ++i;
@@ -125,17 +127,21 @@ public class RPNStack implements Constant {
     /**
      * 队列清除
      */
-    private void clear() throws RPNException {
+    private void clearOrder() throws RPNException {
         // 若清除命令后是最后一位，或下一位是空格，则是清除命令，执行清除
         if (i + CLEAR.length() > l) {
             throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
         } else if (checkClear()) {
-            base.clear();
-            show.clear();
+            clear();
             i += CLEAR.length();
         } else {
             throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
         }
+    }
+
+    private void clear() {
+        base.clear();
+        show.clear();
     }
 
     private boolean checkClear() {
@@ -145,34 +151,80 @@ public class RPNStack implements Constant {
     /**
      * 计算开方
      */
-    private void sqrt() {
+    private void sqrtOrder() throws RPNException {
         // 若开方命令后是最后一位，或下一位是空格，则是开方命令，执行开方运算
-        base.push("sqrt");
+        if (i + SQRT.length() > l) {
+            throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
+        } else if (checkSqrt()) {
+            // 开方运算需要操作数，判断结果集是否满足
+            if (show.empty()) {
+                throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
+            }
+            sqrt();
+            i += SQRT.length();
+        } else {
+            throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
+        }
 
+    }
+
+    private void sqrt() {
+        BigDecimal first = new BigDecimal(show.pop());
+        BigDecimal result = Operation.sqrt(first);
+        show.push(result.toString());
+        base.push(SQRT);
+    }
+
+    private boolean checkSqrt() {
+        return raw.substring(i, i + SQRT.length()).equals(SQRT);
     }
 
     /**
      * 回滚操作
      */
-    private void undo() {
+    private void undoOrder() throws RPNException {
         // 若回滚命令后是最后一位，或下一位是空格，则是回滚命令，执行回滚操作
-        base.pop();
-        this.reBuild();
+        if (i + UNDO.length() > l) {
+            throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
+        } else if (checkUndo()) {
+            base.pop();
+            reBuild();
+            i += UNDO.length();
+        } else {
+            throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
+        }
+    }
+
+    private boolean checkUndo() {
+        return raw.substring(i, i + UNDO.length()).equals(UNDO);
     }
 
     /**
      * 重算当前队列
      */
     private void reBuild() {
-        base.stream().forEach(step -> {
-
+        Stack<String> tmp = (Stack<String>) base.clone();
+        clear();
+        tmp.forEach(item -> {
+            if (item.equals(SQRT)) {
+                this.sqrt();
+            } else if (item.charAt(0) == ADD || item.charAt(0) == REDUCE || item.charAt(0) == MULTIPLY || item.charAt(0) == DIVIDE) {
+                try {
+                    c = item.charAt(0);
+                    this.operation();
+                } catch (RPNException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                this.number(item);
+            }
         });
     }
 
     /**
      * 拼接数字
      */
-    private void number() throws RPNException {
+    private void numberOrder() throws RPNException {
         StringBuilder digitTemp = new StringBuilder();
         while (i < l) {
             // 读取当前字符
@@ -190,8 +242,12 @@ public class RPNStack implements Constant {
             }
             ++i;
         }
-        base.push(digitTemp.toString());
-        show.push(digitTemp.toString());
+        number(digitTemp.toString());
+    }
+
+    private void number(String string) {
+        base.push(string);
+        show.push(string);
     }
 
     private boolean isDigit() {
@@ -205,42 +261,46 @@ public class RPNStack implements Constant {
     /**
      * 确认操作符
      */
-    private void operation() throws RPNException {
+    private void operationOrder() throws RPNException {
         // 若符号后是最后一位，或下一位是空格，则是四则运算符号，执行运算
         if (i + 1 == l || Character.isSpaceChar(raw.charAt(i + 1))) {
             // 四则运算需要操作数与被操作数，判断结果集是否满足
             if (show.size() < OPERATION) {
                 throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
             }
-            BigDecimal second = new BigDecimal(show.pop());
-            BigDecimal first = new BigDecimal(show.pop());
-            BigDecimal result;
-            switch (c) {
-                case ADD:
-                    result = Operation.add(first, second);
-                    break;
-                case REDUCE:
-                    result = Operation.reduce(first, second);
-                    break;
-                case MULTIPLY:
-                    result = Operation.multiply(first, second);
-                    break;
-                case DIVIDE:
-                    result = Operation.divide(first, second);
-                    break;
-                default:
-                    throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
-            }
-            show.push(result.toString());
-            base.push(c + "");
+            operation();
             ++i;
         } else {
             // 当减号后为数字、小数点时，解析为实数，其他字符与符号组合均为异常
             if (c == REDUCE && (Character.isDigit(raw.charAt(i + 1)) || raw.charAt(i + 1) == POINT)) {
-                number();
+                numberOrder();
             } else {
                 throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
             }
         }
+    }
+
+    private void operation() throws RPNException {
+        BigDecimal second = new BigDecimal(show.pop());
+        BigDecimal first = new BigDecimal(show.pop());
+        BigDecimal result;
+        switch (c) {
+            case ADD:
+                result = Operation.add(first, second);
+                break;
+            case REDUCE:
+                result = Operation.reduce(first, second);
+                break;
+            case MULTIPLY:
+                result = Operation.multiply(first, second);
+                break;
+            case DIVIDE:
+                result = Operation.divide(first, second);
+                break;
+            default:
+                throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
+        }
+        show.push(result.toString());
+        base.push(c + "");
     }
 }
