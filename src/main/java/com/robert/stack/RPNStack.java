@@ -3,9 +3,10 @@ package com.robert.stack;
 import java.math.BigDecimal;
 import java.util.Stack;
 
-import com.robert.Constant;
+import com.robert.util.Constant;
 import com.robert.RPNException;
 import com.robert.math.Operation;
+import com.robert.util.StringUtil;
 
 
 /**
@@ -171,7 +172,7 @@ public class RPNStack implements Constant {
     private void sqrt() {
         BigDecimal first = new BigDecimal(show.pop());
         BigDecimal result = Operation.sqrt(first);
-        show.push(result.toString());
+        show.push(StringUtil.subZeroAndDot(result.toString()));
         base.push(SQRT);
     }
 
@@ -247,7 +248,7 @@ public class RPNStack implements Constant {
 
     private void number(String string) {
         base.push(string);
-        show.push(string);
+        show.push(StringUtil.subZeroAndDot(string));
     }
 
     private boolean isDigit() {
@@ -300,7 +301,7 @@ public class RPNStack implements Constant {
             default:
                 throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
         }
-        show.push(result.toString());
+        show.push(StringUtil.subZeroAndDot(result.toString()));
         base.push(c + "");
     }
 }

@@ -1,4 +1,4 @@
-package com.robert;
+package com.robert.util;
 
 import java.math.BigDecimal;
 
@@ -88,7 +88,7 @@ public interface Constant {
     /**
      * 显示精度
      */
-    int SHOW_PRECISION = FIFTEEN;
+    int SHOW_PRECISION = TEN;
 
     /**
      * 计算精度
@@ -98,5 +98,5 @@ public interface Constant {
     /**
      * 进位方式
      */
-    int ROUNDING_MODE = BigDecimal.ROUND_HALF_EVEN;
+    int ROUNDING_MODE = BigDecimal.ROUND_DOWN;
 }
