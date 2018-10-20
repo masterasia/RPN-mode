@@ -8,17 +8,24 @@ import com.robert.stack.RPNStack;
  */
 public class RPNStackTest {
 
-    public static void testPushNumber(){
-        RPNStack rpnStack  = new RPNStack();
+    public static void testPushNumber() {
+        RPNStack rpnStack = new RPNStack();
         rpnStack.unpackVar("-23.23");
         rpnStack.unpackVar("-23.23 0.23123 3123");
         rpnStack.unpackVar("-23.23 2312313123 3213131.312313123");
         rpnStack.unpackVar("-23.23 23131313 -12313 12313");
         rpnStack.unpackVar("-23.23 0. 123131 ");
-        rpnStack.unpackVar("-23.23");
+        rpnStack.unpackVar("-23.23 -.321");
+    }
+
+    public static void testPushOperator() {
+        RPNStack rpnStack = new RPNStack();
+        // rpnStack.unpackVar("-23.23 0.23123 + -3223 -");
+        rpnStack.unpackVar("-23.23 0.23123 + -3223 * -");
     }
 
     public static void main(String[] args) {
-        testPushNumber();
+        // testPushNumber();
+        testPushOperator();
     }
 }

@@ -1,7 +1,10 @@
 package com.robert.stack;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Stack;
+
+import com.robert.math.Operation;
 
 /**
  * a stack for RPN
@@ -47,6 +50,17 @@ public class RPNStack {
     private String errMessage = "operator <%s> (position: <%d>): insufficient parameters";
 
     /**
+     * 小数点标记
+     */
+    private final static char POINT = '.';
+
+    /**
+     * 四则运算所需实数个数
+     */
+    private final static int OPERATION = 2;
+
+
+    /**
      * 接收待处理命令
      * 分析待处理命令
      * 打印结果集信息
@@ -86,7 +100,7 @@ public class RPNStack {
                 case '7':
                 case '8':
                 case '9':
-                case '.':
+                case POINT:
                     this.number();
                     break;
                 case 'c':
@@ -123,6 +137,7 @@ public class RPNStack {
      * 计算开方
      */
     private void sqrt() {
+        // 若开方命令后是最后一位，或下一位是空格，则是开方符号，执行运算
         base.push("sqrt");
 
     }
@@ -154,32 +169,68 @@ public class RPNStack {
             // 读取当前字符
             nextChar();
             // 添加负数、小数，符号、小数点仅能添加一次
-            if (c == '-' || c == '.') {
-                if ((c == '-' && digitTemp.toString().contains("-")) || (c == '.' && digitTemp.toString().contains("."))) {
+            if (isDigit()) {
+                if (format(digitTemp.toString())) {
                     throw new Exception(String.format(errMessage, c, i + 1));
                 }
-                digitTemp.append(c);
-            } else if (c >= '0' && c <= '9') {
                 digitTemp.append(c);
             } else if (c == ' ') {
                 break;
             } else {
-                break;
+                throw new Exception(String.format(errMessage, c, i + 1));
             }
             ++i;
         }
         base.push(digitTemp.toString());
+        show.push(digitTemp.toString());
+    }
+
+    private boolean isDigit() {
+        return (c >= '0' && c <= '9') || c == '-' || c == '.';
+    }
+
+    private boolean format(String checkString) {
+        return (c == '-' && checkString.contains("-")) || (c == POINT && checkString.contains(POINT + ""));
     }
 
     /**
      * 确认操作符
      */
     private void operation() throws Exception {
-        // 若减号后不是空格，且不是最后一位，则是实数符号，应切换Number
-        if (i + 1 < l && !Character.isSpaceChar(raw.charAt(i + 1))) {
-            this.number();
+        // 若符号后是最后一位，或下一位是空格，则是四则运算符号，执行运算
+        if (i + 1 == l || Character.isSpaceChar(raw.charAt(i + 1))) {
+            // 四则运算需要操作数与被操作数，判断结果集是否满足
+            if (show.size() < OPERATION) {
+                throw new Exception(String.format(errMessage, c, i));
+            }
+            BigDecimal second = new BigDecimal(show.pop());
+            BigDecimal first = new BigDecimal(show.pop());
+            BigDecimal result;
+            switch (c) {
+                case '+':
+                    result = Operation.add(first, second);
+                    break;
+                case '-':
+                    result = Operation.reduction(first, second);
+                    break;
+                case '*':
+                    result = Operation.multiply(first, second);
+                    break;
+                case '/':
+                    result = Operation.divide(first, second);
+                    break;
+                default:
+                    throw new Exception(String.format(errMessage, c, i));
+            }
+            show.push(result.toString());
+            ++i;
         } else {
-
+            // 当减号后为数字、小数点时，解析为实数，其他字符与符号组合均为异常
+            if (c == '-' && (Character.isDigit(raw.charAt(i + 1)) || raw.charAt(i + 1) == '.')) {
+                number();
+            } else {
+                throw new Exception(String.format(errMessage, c, i));
+            }
         }
     }
 }
