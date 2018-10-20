@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Stack;
 
+import com.robert.Constant;
+import com.robert.RPNException;
 import com.robert.math.Operation;
+
 
 /**
  * a stack for RPN
@@ -12,7 +15,7 @@ import com.robert.math.Operation;
  * @author Robert.XU <xutao@bjnja.com>
  * @version RPN-mode, 2018/10/18 0018
  */
-public class RPNStack {
+public class RPNStack implements Constant {
 
     /**
      * save step
@@ -44,21 +47,6 @@ public class RPNStack {
      */
     private char c;
 
-    /**
-     * 异常标记语句
-     */
-    private String errMessage = "operator <%s> (position: <%d>): insufficient parameters";
-
-    /**
-     * 小数点标记
-     */
-    private final static char POINT = '.';
-
-    /**
-     * 四则运算所需实数个数
-     */
-    private final static int OPERATION = 2;
-
 
     /**
      * 接收待处理命令
@@ -73,50 +61,59 @@ public class RPNStack {
         l = raw.length();
         try {
             this.RPN();
-        } catch (Exception e) {
+        } catch (RPNException e) {
             System.out.println(e.getMessage());
         }
         System.out.println(Arrays.toString(base.toArray()));
-        System.out.println(Arrays.toString(show.toArray()));
+        System.out.print("stack: " );
+        show.forEach(number -> {
+            if (number.contains(POINT + "") && number.indexOf(POINT + "") + TEN <= number.length()){
+                System.out.print(new BigDecimal(number).setScale(SHOW_PRECISION, ROUNDING_MODE));
+            }else{
+                System.out.print(number);
+            }
+            System.out.print(SPACE);
+        });
+        System.out.println();
     }
 
-    private void RPN() throws Exception {
+    private void RPN() throws RPNException {
         while (i < l) {
             nextChar();
             switch (c) {
-                case '+':
-                case '-':
-                case '*':
-                case '/':
+                case ADD:
+                case REDUCE:
+                case MULTIPLY:
+                case DIVIDE:
                     this.operation();
                     break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
+                case ZERO:
+                case ONE:
+                case TWO:
+                case THREE:
+                case FOUR:
+                case FIVE:
+                case SIX:
+                case SEVEN:
+                case EIGHT:
+                case NINE:
                 case POINT:
                     this.number();
                     break;
-                case 'c':
+                case CLEAR_START:
                     this.clear();
                     break;
-                case 'u':
+                case UNDO_START:
                     this.undo();
                     break;
-                case 's':
+                case SQRT_START:
                     this.sqrt();
                     break;
-                case ' ':
+                case SPACE:
                     ++i;
                     break;
                 default:
-                    throw new Exception(String.format(errMessage, c, i + 1));
+                    throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
             }
         }
     }
@@ -128,16 +125,28 @@ public class RPNStack {
     /**
      * 队列清除
      */
-    private void clear() {
-        base.clear();
-        show.clear();
+    private void clear() throws RPNException {
+        // 若清除命令后是最后一位，或下一位是空格，则是清除命令，执行清除
+        if (i + CLEAR.length() > l) {
+            throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
+        } else if (checkClear()) {
+            base.clear();
+            show.clear();
+            i += CLEAR.length();
+        } else {
+            throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
+        }
+    }
+
+    private boolean checkClear() {
+        return raw.substring(i, i + CLEAR.length()).equals(CLEAR);
     }
 
     /**
      * 计算开方
      */
     private void sqrt() {
-        // 若开方命令后是最后一位，或下一位是空格，则是开方符号，执行运算
+        // 若开方命令后是最后一位，或下一位是空格，则是开方命令，执行开方运算
         base.push("sqrt");
 
     }
@@ -146,6 +155,7 @@ public class RPNStack {
      * 回滚操作
      */
     private void undo() {
+        // 若回滚命令后是最后一位，或下一位是空格，则是回滚命令，执行回滚操作
         base.pop();
         this.reBuild();
     }
@@ -162,22 +172,21 @@ public class RPNStack {
     /**
      * 拼接数字
      */
-    private void number() throws Exception {
-        boolean digitFlag = false;
-        StringBuffer digitTemp = new StringBuffer();
+    private void number() throws RPNException {
+        StringBuilder digitTemp = new StringBuilder();
         while (i < l) {
             // 读取当前字符
             nextChar();
             // 添加负数、小数，符号、小数点仅能添加一次
             if (isDigit()) {
                 if (format(digitTemp.toString())) {
-                    throw new Exception(String.format(errMessage, c, i + 1));
+                    throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
                 }
                 digitTemp.append(c);
-            } else if (c == ' ') {
+            } else if (Character.isSpaceChar(c)) {
                 break;
             } else {
-                throw new Exception(String.format(errMessage, c, i + 1));
+                throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
             }
             ++i;
         }
@@ -186,50 +195,51 @@ public class RPNStack {
     }
 
     private boolean isDigit() {
-        return (c >= '0' && c <= '9') || c == '-' || c == '.';
+        return (c >= ZERO && c <= NINE) || c == REDUCE || c == POINT;
     }
 
     private boolean format(String checkString) {
-        return (c == '-' && checkString.contains("-")) || (c == POINT && checkString.contains(POINT + ""));
+        return (c == REDUCE && checkString.contains(REDUCE + "")) || (c == POINT && checkString.contains(POINT + ""));
     }
 
     /**
      * 确认操作符
      */
-    private void operation() throws Exception {
+    private void operation() throws RPNException {
         // 若符号后是最后一位，或下一位是空格，则是四则运算符号，执行运算
         if (i + 1 == l || Character.isSpaceChar(raw.charAt(i + 1))) {
             // 四则运算需要操作数与被操作数，判断结果集是否满足
             if (show.size() < OPERATION) {
-                throw new Exception(String.format(errMessage, c, i));
+                throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
             }
             BigDecimal second = new BigDecimal(show.pop());
             BigDecimal first = new BigDecimal(show.pop());
             BigDecimal result;
             switch (c) {
-                case '+':
+                case ADD:
                     result = Operation.add(first, second);
                     break;
-                case '-':
-                    result = Operation.reduction(first, second);
+                case REDUCE:
+                    result = Operation.reduce(first, second);
                     break;
-                case '*':
+                case MULTIPLY:
                     result = Operation.multiply(first, second);
                     break;
-                case '/':
+                case DIVIDE:
                     result = Operation.divide(first, second);
                     break;
                 default:
-                    throw new Exception(String.format(errMessage, c, i));
+                    throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
             }
             show.push(result.toString());
+            base.push(c + "");
             ++i;
         } else {
             // 当减号后为数字、小数点时，解析为实数，其他字符与符号组合均为异常
-            if (c == '-' && (Character.isDigit(raw.charAt(i + 1)) || raw.charAt(i + 1) == '.')) {
+            if (c == REDUCE && (Character.isDigit(raw.charAt(i + 1)) || raw.charAt(i + 1) == POINT)) {
                 number();
             } else {
-                throw new Exception(String.format(errMessage, c, i));
+                throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
             }
         }
     }
