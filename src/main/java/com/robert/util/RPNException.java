@@ -1,4 +1,4 @@
-package com.robert;
+package com.robert.util;
 
 /**
  * @author Robert.XU <xutao@bjnja.com>
