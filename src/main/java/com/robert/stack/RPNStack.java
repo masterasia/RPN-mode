@@ -61,6 +61,7 @@ public class RPNStack implements Constant {
         try {
             this.RPN();
         } catch (RPNException e) {
+            // TODO 接入其他系统后异常打印使用统一日志替换
             System.out.println(e.getMessage());
         }
     }
@@ -69,6 +70,7 @@ public class RPNStack implements Constant {
      * 打印结果集信息
      */
     public void print() {
+        // TODO 接入其他系统后打印语句使用统一日志替换
         System.out.print("stack: ");
         show.forEach(number -> {
             if (number.contains(POINT + "") && number.indexOf(POINT + "") + TEN <= number.length()) {
