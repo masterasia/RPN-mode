@@ -10,6 +10,7 @@ import static com.robert.util.Constant.ROUNDING_MODE;
  * @version RPN-mode, 2018/10/18 0018
  */
 public class Operation {
+
     /**
      * 不开放实例化
      */

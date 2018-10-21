@@ -2,7 +2,19 @@ package com.robert;
 
 import java.util.Scanner;
 
+import com.robert.stack.RPNStack;
+
 /**
+ * RPN 计算器
+ * 启动后可持续进行运算输入，计算器会自动进行RPN规则操作。
+ * 计算器允许输入 整数、小数 四则运算符号
+ * 使用命令 sqrt 进行开方运算，仅返回正根
+ * 使用命令 undo 进行回滚操作，取消上一次命令
+ * 使用命令 clear 清空结果集
+ * 使用命令 exit 可退出计算器
+ * 运算过程如遇小数，则保留15位
+ * 结果集展示，如小数部分超出10位，仅保留10位
+ *
  * @author Robert.XU <xutao@bjnja.com>
  * @version RPN-mode, 2018/10/18 0018
  */
@@ -10,17 +22,20 @@ public class Application {
 
     /**
      * 执行入口
+     *
      * @param args 输入参数
      */
     public static void main(String[] args) {
+        RPNStack rpnStack = new RPNStack();
         Scanner scanner = new Scanner(System.in);
         boolean runnerFlag = true;
-        while(runnerFlag){
+        while (runnerFlag) {
             String readLine = scanner.nextLine();
-            if (readLine.equals("exit")){
+            if (readLine.equals("exit")) {
                 runnerFlag = false;
-            }else {
-                System.out.println(readLine);
+            } else {
+                rpnStack.unpackOrder(readLine);
+                rpnStack.print();
             }
         }
     }

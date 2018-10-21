@@ -13,7 +13,7 @@ public interface Constant {
     String ERROR_MESSAGE = "operator %s (position: %d): insufficient parameters";
 
     /**
-     * 小数点标记
+     * 小数点符号
      */
     char POINT = '.';
 
@@ -26,7 +26,7 @@ public interface Constant {
     char DIVIDE = '/';
 
     /**
-     * 数字
+     * 数字-字符
      */
     char ZERO = '0';
     char ONE = '1';
@@ -39,7 +39,7 @@ public interface Constant {
     char EIGHT = '8';
     char NINE = '9';
     /**
-     * 数字
+     * 数字-数值
      */
     int ZERO_NUMBER = 0;
     int ONE_NUMBER = 1;
@@ -99,4 +99,11 @@ public interface Constant {
      * 进位方式
      */
     int ROUNDING_MODE = BigDecimal.ROUND_DOWN;
+
+    /**
+     * 数学标记
+     */
+    String NATURAL_LOGARITHM = "e";
+
+    String SCIENTIFIC_COUNTING = "E";
 }

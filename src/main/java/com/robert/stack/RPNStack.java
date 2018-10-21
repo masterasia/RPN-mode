@@ -3,9 +3,9 @@ package com.robert.stack;
 import java.math.BigDecimal;
 import java.util.Stack;
 
-import com.robert.util.Constant;
 import com.robert.RPNException;
 import com.robert.math.Operation;
+import com.robert.util.Constant;
 import com.robert.util.StringUtil;
 
 
@@ -51,11 +51,10 @@ public class RPNStack implements Constant {
     /**
      * 接收待处理命令
      * 分析待处理命令
-     * 打印结果集信息
      *
      * @param raw 待处理命令
      */
-    public void unpackVar(String raw) {
+    public void unpackOrder(String raw) {
         this.raw = raw;
         i = 0;
         l = raw.length();
@@ -64,9 +63,11 @@ public class RPNStack implements Constant {
         } catch (RPNException e) {
             System.out.println(e.getMessage());
         }
-        print();
     }
 
+    /**
+     * 打印结果集信息
+     */
     public void print() {
         System.out.print("stack: ");
         show.forEach(number -> {
@@ -80,6 +81,21 @@ public class RPNStack implements Constant {
         System.out.println();
     }
 
+    /**
+     * 获取结果集
+     *
+     * @return 命令操作后的结果集-字符串数组
+     */
+    public String[] getResult() {
+        String[] strings = new String[show.size()];
+        return show.toArray(strings);
+    }
+
+    /**
+     * 解析命令函数
+     *
+     * @throws RPNException 解析异常
+     */
     private void RPN() throws RPNException {
         while (i < l) {
             nextChar();
@@ -121,12 +137,15 @@ public class RPNStack implements Constant {
         }
     }
 
+    /**
+     * 获取命令集当前字符
+     */
     private void nextChar() {
         c = raw.charAt(i);
     }
 
     /**
-     * 队列清除
+     * 队列清除命令
      */
     private void clearOrder() throws RPNException {
         // 若清除命令后是最后一位，或下一位是空格，则是清除命令，执行清除
@@ -140,17 +159,25 @@ public class RPNStack implements Constant {
         }
     }
 
-    private void clear() {
-        base.clear();
-        show.clear();
-    }
-
+    /**
+     * 队列清除命令校验
+     *
+     * @return 校验结果
+     */
     private boolean checkClear() {
         return raw.substring(i, i + CLEAR.length()).equals(CLEAR);
     }
 
     /**
-     * 计算开方
+     * 队列清除操作
+     */
+    private void clear() {
+        base.clear();
+        show.clear();
+    }
+
+    /**
+     * 开方命令
      */
     private void sqrtOrder() throws RPNException {
         // 若开方命令后是最后一位，或下一位是空格，则是开方命令，执行开方运算
@@ -169,6 +196,18 @@ public class RPNStack implements Constant {
 
     }
 
+    /**
+     * 开方命令校验
+     *
+     * @return 校验结果
+     */
+    private boolean checkSqrt() {
+        return raw.substring(i, i + SQRT.length()).equals(SQRT);
+    }
+
+    /**
+     * 开方操作
+     */
     private void sqrt() {
         BigDecimal first = new BigDecimal(show.pop());
         BigDecimal result = Operation.sqrt(first);
@@ -176,12 +215,8 @@ public class RPNStack implements Constant {
         base.push(SQRT);
     }
 
-    private boolean checkSqrt() {
-        return raw.substring(i, i + SQRT.length()).equals(SQRT);
-    }
-
     /**
-     * 回滚操作
+     * 回滚命令-执行
      */
     private void undoOrder() throws RPNException {
         // 若回滚命令后是最后一位，或下一位是空格，则是回滚命令，执行回滚操作
@@ -196,12 +231,18 @@ public class RPNStack implements Constant {
         }
     }
 
+    /**
+     * 回滚命令校验
+     *
+     * @return 校验结果
+     */
     private boolean checkUndo() {
         return raw.substring(i, i + UNDO.length()).equals(UNDO);
     }
 
     /**
-     * 重算当前队列
+     * 回滚操作实质上取消了上一位历史操作记录
+     * 通过操作历史base队列，重算当前结果集队列show
      */
     private void reBuild() {
         Stack<String> tmp = (Stack<String>) base.clone();
@@ -210,12 +251,8 @@ public class RPNStack implements Constant {
             if (item.equals(SQRT)) {
                 this.sqrt();
             } else if (item.charAt(0) == ADD || item.charAt(0) == REDUCE || item.charAt(0) == MULTIPLY || item.charAt(0) == DIVIDE) {
-                try {
-                    c = item.charAt(0);
-                    this.operation();
-                } catch (RPNException e) {
-                    e.printStackTrace();
-                }
+                c = item.charAt(0);
+                this.operation();
             } else {
                 this.number(item);
             }
@@ -223,7 +260,7 @@ public class RPNStack implements Constant {
     }
 
     /**
-     * 拼接数字
+     * 读取数字
      */
     private void numberOrder() throws RPNException {
         StringBuilder digitTemp = new StringBuilder();
@@ -246,21 +283,39 @@ public class RPNStack implements Constant {
         number(digitTemp.toString());
     }
 
-    private void number(String string) {
-        base.push(string);
-        show.push(StringUtil.subZeroAndDot(string));
-    }
-
+    /**
+     * 数字校验
+     *
+     * @return 校验结果
+     */
     private boolean isDigit() {
         return (c >= ZERO && c <= NINE) || c == REDUCE || c == POINT;
     }
 
+    /**
+     * 符号位、小数位校验
+     *
+     * @param checkString 待校验数字字符串
+     * @return 校验结果
+     */
     private boolean format(String checkString) {
         return (c == REDUCE && checkString.contains(REDUCE + "")) || (c == POINT && checkString.contains(POINT + ""));
     }
 
     /**
-     * 确认操作符
+     * 缓存数字
+     *
+     * @param string 待存储对象
+     */
+    private void number(String string) {
+        base.push(string);
+        show.push(StringUtil.subZeroAndDot(string));
+    }
+
+    /**
+     * 四则运算命令
+     *
+     * @throws RPNException 命令异常
      */
     private void operationOrder() throws RPNException {
         // 若符号后是最后一位，或下一位是空格，则是四则运算符号，执行运算
@@ -272,7 +327,8 @@ public class RPNStack implements Constant {
             operation();
             ++i;
         } else {
-            // 当减号后为数字、小数点时，解析为实数，其他字符与符号组合均为异常
+            // 当减号后为数字、小数点时，解析为负数，其他字符与符号组合均为异常
+            // 不考虑正数以+开头场景
             if (c == REDUCE && (Character.isDigit(raw.charAt(i + 1)) || raw.charAt(i + 1) == POINT)) {
                 numberOrder();
             } else {
@@ -281,14 +337,14 @@ public class RPNStack implements Constant {
         }
     }
 
-    private void operation() throws RPNException {
+    /**
+     * 四则运算
+     */
+    private void operation() {
         BigDecimal second = new BigDecimal(show.pop());
         BigDecimal first = new BigDecimal(show.pop());
         BigDecimal result;
         switch (c) {
-            case ADD:
-                result = Operation.add(first, second);
-                break;
             case REDUCE:
                 result = Operation.reduce(first, second);
                 break;
@@ -299,7 +355,8 @@ public class RPNStack implements Constant {
                 result = Operation.divide(first, second);
                 break;
             default:
-                throw new RPNException(String.format(ERROR_MESSAGE, c, i + 1));
+                result = Operation.add(first, second);
+                break;
         }
         show.push(StringUtil.subZeroAndDot(result.toString()));
         base.push(c + "");
