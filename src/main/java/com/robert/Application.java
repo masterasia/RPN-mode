@@ -2,7 +2,12 @@ package com.robert;
 
 import java.util.Scanner;
 
-import com.robert.stack.RPNStack;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+import com.robert.stack.RPNCalculator;
 
 /**
  * RPN 计算器
@@ -18,7 +23,11 @@ import com.robert.stack.RPNStack;
  * @author Robert.XU <xutao@bjnja.com>
  * @version RPN-mode, 2018/10/18 0018
  */
+@SpringBootApplication
 public class Application {
+
+    @Autowired
+    private RPNCalculator rpnStack;
 
     /**
      * 执行入口
@@ -26,7 +35,12 @@ public class Application {
      * @param args 输入参数
      */
     public static void main(String[] args) {
-        RPNStack rpnStack = new RPNStack();
+        ApplicationContext applicationContext = SpringApplication.run(Application.class);
+        Application application = (Application) applicationContext.getBean("application");
+        application.run(args);
+    }
+
+    public void run(String... args) {
         Scanner scanner = new Scanner(System.in);
         boolean runnerFlag = true;
         while (runnerFlag) {

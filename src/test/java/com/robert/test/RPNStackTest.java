@@ -1,32 +1,35 @@
 package com.robert.test;
 
-import com.robert.stack.RPNStack;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import com.robert.stack.RPNCalculator;
 
 /**
  * @author Robert.XU <xutao@bjnja.com>
  * @version RPN-mode, 2018/10/18 0018
  */
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class RPNStackTest {
 
-    public static void main(String[] args) {
-        testPi();
-        testE();
-        ExampleOne();
-        ExampleTwo();
-        ExampleThree();
-        ExampleFour();
-        ExampleFive();
-        ExampleSix();
-        ExampleSeven();
-        ExampleEight();
+    @Autowired
+    private RPNCalculator rpnStack;
+
+    @Before
+    public void setUp() throws Exception {
+        rpnStack.unpackOrder("clear");
     }
 
     /**
      * 模拟计算π值
      */
-    public static void testPi() {
-        RPNStack rpnStack = new RPNStack();
-
+    @Test
+    public void testPi() {
         rpnStack.unpackOrder("2");
         int index = 1;
         int step = 3;
@@ -47,9 +50,8 @@ public class RPNStackTest {
     /**
      * 模拟计算自然对数
      */
-    public static void testE() {
-        RPNStack rpnStack = new RPNStack();
-
+    @Test
+    public void testE() {
         rpnStack.unpackOrder("1 ");
         int index = 1;
         StringBuilder stringBuilder = new StringBuilder(" 1 ");
@@ -68,61 +70,72 @@ public class RPNStackTest {
     /**
      * 标准化测试
      */
-    public static void ExampleOne() {
-        RPNStack rpnStack = new RPNStack();
+    @Test
+    public void ExampleOne() {
         rpnStack.unpackOrder("5 2");
         rpnStack.print();
     }
 
-    public static void ExampleTwo() {
-        RPNStack rpnStack = new RPNStack();
+    @Test
+    public void ExampleTwo() {
         rpnStack.unpackOrder("2 sqrt");
+        rpnStack.print();
         rpnStack.unpackOrder("clear 9 sqrt");
         rpnStack.print();
     }
 
-    public static void ExampleThree() {
-        RPNStack rpnStack = new RPNStack();
+    @Test
+    public void ExampleThree() {
         rpnStack.unpackOrder("5 2 -");
+        rpnStack.print();
         rpnStack.unpackOrder("3 -");
+        rpnStack.print();
         rpnStack.unpackOrder("clear");
         rpnStack.print();
     }
 
-    public static void ExampleFour() {
-        RPNStack rpnStack = new RPNStack();
+    @Test
+    public void ExampleFour() {
         rpnStack.unpackOrder("5 4 3 2");
+        rpnStack.print();
         rpnStack.unpackOrder("undo undo *");
+        rpnStack.print();
         rpnStack.unpackOrder("5 *");
+        rpnStack.print();
         rpnStack.unpackOrder("undo");
         rpnStack.print();
     }
 
-    public static void ExampleFive() {
-        RPNStack rpnStack = new RPNStack();
+    @Test
+    public void ExampleFive() {
         rpnStack.unpackOrder("7 12 2 /");
+        rpnStack.print();
         rpnStack.unpackOrder("*");
+        rpnStack.print();
         rpnStack.unpackOrder("4 /");
         rpnStack.print();
     }
 
-    public static void ExampleSix() {
-        RPNStack rpnStack = new RPNStack();
+    @Test
+    public void ExampleSix() {
         rpnStack.unpackOrder("1 2 3 4 5");
+        rpnStack.print();
         rpnStack.unpackOrder("*");
+        rpnStack.print();
         rpnStack.unpackOrder("clear 3 4 -");
         rpnStack.print();
     }
 
-    public static void ExampleSeven() {
-        RPNStack rpnStack = new RPNStack();
+    @Test
+    public void ExampleSeven() {
         rpnStack.unpackOrder("1 2 3 4 5");
+        rpnStack.print();
         rpnStack.unpackOrder("* * * *");
         rpnStack.print();
     }
 
-    public static void ExampleEight() {
-        RPNStack rpnStack = new RPNStack();
+    @Test
+    public void ExampleEight() {
         rpnStack.unpackOrder("1 2 3 * 5 + * * 6 5");
         rpnStack.print();
     }

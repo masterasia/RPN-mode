@@ -1,7 +1,6 @@
 package com.robert.util;
 
-import static com.robert.util.Constant.POINT;
-import static com.robert.util.Constant.SCIENTIFIC_COUNTING;
+import java.util.regex.Pattern;
 
 /**
  * @author Robert.XU <xutao@bjnja.com>
@@ -10,14 +9,18 @@ import static com.robert.util.Constant.SCIENTIFIC_COUNTING;
 public class StringUtil {
 
     /**
-     * 使用java正则表达式去掉多余的0
-     * 科学计数法无需处理
+     * 判断小数的正则
+     */
+    private static Pattern NUMBER_PATTERN = Pattern.compile("^-?[0-9]+\\.[0-9]+$") ;
+
+    /**
+     * 使用java正则表达式去掉小数多余的0和小数点
      *
      * @param number String格式的数字
      * @return 调整后的数据
      */
     public static String subZeroAndDot(String number) {
-        if (number.indexOf(POINT) > 0 && !number.contains(SCIENTIFIC_COUNTING)) {
+        if (NUMBER_PATTERN.matcher(number).matches()) {
             number = number.replaceAll("0+?$", "");
             number = number.replaceAll("[.]$", "");
         }

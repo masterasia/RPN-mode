@@ -18,14 +18,6 @@ public interface Constant {
     char POINT = '.';
 
     /**
-     * 运算符号
-     */
-    char ADD = '+';
-    char REDUCE = '-';
-    char MULTIPLY = '*';
-    char DIVIDE = '/';
-
-    /**
      * 数字-字符
      */
     char ZERO = '0';
@@ -57,33 +49,13 @@ public interface Constant {
     int THIRTEEN = 13;
     int FOURTEEN = 14;
     int FIFTEEN = 15;
+    int HUNDRED = 100;
+    double SQRT_START = 2.0;
 
     /**
      * 空格
      */
     char SPACE = ' ';
-
-    /**
-     * 清除命令
-     */
-    char CLEAR_START = 'c';
-    String CLEAR = "clear";
-
-    /**
-     * 开方命令
-     */
-    char SQRT_START = 's';
-    String SQRT = "sqrt";
-
-    /**
-     * 回滚命令
-     */
-    char UNDO_START = 'u';
-    String UNDO = "undo";
-    /**
-     * 四则运算所需实数个数
-     */
-    int OPERATION = 2;
 
     /**
      * 显示精度

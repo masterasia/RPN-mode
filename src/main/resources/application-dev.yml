@@ -1,0 +1,4 @@
+# Spring配置
+spring:
+  application:
+    name: rpn
