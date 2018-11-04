@@ -121,9 +121,9 @@ public class RPNCalculator implements Constant {
      * 刷新数据为上一条历史记录中的数据
      */
     public void moveToLast() {
-        index--;
         if (index >= 0 && index < mementos.size()) {
             stack.restore(mementos.get(index));
+            index--;
         } else {
             error = true;
         }
@@ -134,11 +134,10 @@ public class RPNCalculator implements Constant {
      * 刷新数据为下一条历史记录的数据
      */
     public void moveToNext() {
-        index++;
         if (index >= 0 && index < mementos.size()) {
             stack.restore(mementos.get(index));
+            index++;
         } else {
-            index--;
             error = true;
         }
     }
@@ -182,8 +181,8 @@ public class RPNCalculator implements Constant {
                     // 判断词是否为数字
                     BigDecimal bigDecimal = new BigDecimal(word);
                     logger.info(" find a number , {}", bigDecimal);
-                    stack.push(bigDecimal.toString());
                     save();
+                    stack.push(bigDecimal.toString());
                 } catch (NumberFormatException e) {
                     // 非数字且为未注册命令，则抛出异常
                     logger.error(" wrong input : {}", word);
