@@ -155,9 +155,8 @@ public class RPNCalculator implements Constant {
      *
      * @return 命令操作后的结果集-字符串数组
      */
-    public String[] getResult() {
-        String[] strings = new String[stack.getShow().size()];
-        return stack.getShow().toArray(strings);
+    public String getResult() {
+        return stack.toString();
     }
 
     /**

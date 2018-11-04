@@ -114,6 +114,6 @@ public class RPNStack implements Constant {
             }
             stringBuilder.append(SPACE);
         });
-        return stringBuilder.toString();
+        return stringBuilder.toString().trim();
     }
 }
