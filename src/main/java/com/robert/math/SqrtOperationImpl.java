@@ -67,8 +67,10 @@ public class SqrtOperationImpl implements OperationService, Constant {
         BigDecimal base = number.get(0);
         if (ONE_NUMBER == base.signum()) {
             return StringUtil.subZeroAndDot(sqrt(base, OPERATOR_PRECISION).toString());
+        } else if (ZERO_NUMBER == base.signum()) {
+            return ZERO;
         } else {
-            logger.error("");
+            logger.error(" Negative number can not execute : {}", base);
             rpnCalculator.isError();
             rpnCalculator.setNumbersBack(number);
             return null;
@@ -90,7 +92,7 @@ public class SqrtOperationImpl implements OperationService, Constant {
         BigDecimal temp = BigDecimal.valueOf(SQRT_START);
         int precision = HUNDRED;
         MathContext mathContext = new MathContext(precision, RoundingMode.HALF_UP);
-        int count = ZERO;
+        int count = ZERO_NUMBER;
         BigDecimal deviation = sourceNum;
         while (count < HUNDRED) {
             deviation = (deviation.add(sourceNum.divide(deviation, mathContext))).divide(temp, mathContext);

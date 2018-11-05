@@ -139,6 +139,7 @@ public class RPNCalculator implements Constant {
                 // 自动回退
                 this.moveToLast();
             }
+            logger.error(" error in execute : {} ", order);
             throw new RPNException();
         }
     }
@@ -216,6 +217,7 @@ public class RPNCalculator implements Constant {
         }
         // 确认可提供运算方法所需的数据
         if (operationMap.get(operator).getNumbers() > stack.size()) {
+            logger.error(" input not enough for : {}", operator);
             throw new RPNException();
         } else {
             if (operationMap.get(operator).needCache()) {

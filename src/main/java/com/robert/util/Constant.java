@@ -15,21 +15,21 @@ public interface Constant {
     /**
      * 小数点符号
      */
-    char POINT = '.';
+    String POINT = ".";
 
     /**
      * 数字-字符
      */
-    char ZERO = '0';
-    char ONE = '1';
-    char TWO = '2';
-    char THREE = '3';
-    char FOUR = '4';
-    char FIVE = '5';
-    char SIX = '6';
-    char SEVEN = '7';
-    char EIGHT = '8';
-    char NINE = '9';
+    String ZERO = "0";
+    String ONE = "1";
+    String TWO = "2";
+    String THREE = "3";
+    String FOUR = "4";
+    String FIVE = "5";
+    String SIX = "6";
+    String SEVEN = "7";
+    String EIGHT = "8";
+    String NINE = "9";
     /**
      * 数字-数值
      */
@@ -55,7 +55,7 @@ public interface Constant {
     /**
      * 空格
      */
-    char SPACE = ' ';
+    String SPACE = " ";
 
     /**
      * 显示精度
