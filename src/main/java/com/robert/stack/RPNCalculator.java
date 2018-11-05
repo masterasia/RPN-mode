@@ -134,6 +134,11 @@ public class RPNCalculator implements Constant {
         }
 
         if (error) {
+            // 运算中出现异常，将由操作执行标记，标识当前操作异常，该操作若为需要缓存的操作，则会导致缓存异常操作一次，需要进行自动回退
+            if (operationMap.get(order).needCache()) {
+                // 自动回退
+                this.moveToLast();
+            }
             throw new RPNException();
         }
     }
