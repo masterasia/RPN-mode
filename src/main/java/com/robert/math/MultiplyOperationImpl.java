@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import com.robert.stack.RPNCalculator;
 
+import static com.robert.util.Constant.ZERO_NUMBER;
+
 /**
  * 乘法运算方法
  *
@@ -76,6 +78,9 @@ public class MultiplyOperationImpl implements OperationService {
      * @return 积
      */
     private static BigDecimal multiply(BigDecimal first, BigDecimal second) {
+        if (first.signum() == ZERO_NUMBER || second.signum() == ZERO_NUMBER){
+            return BigDecimal.valueOf(ZERO_NUMBER);
+        }
         return first.multiply(second);
     }
 }
