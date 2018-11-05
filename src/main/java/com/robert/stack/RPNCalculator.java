@@ -210,13 +210,13 @@ public class RPNCalculator implements Constant {
      *
      * @param operator 运算符号
      */
-    public synchronized void notifyObservers(String operator) {
+    public synchronized void notifyObservers(String operator) throws RPNException {
         if (!changed) {
             return;
         }
         // 确认可提供运算方法所需的数据
         if (operationMap.get(operator).getNumbers() > stack.size()) {
-            error = true;
+            throw new RPNException();
         } else {
             if (operationMap.get(operator).needCache()) {
                 // 操作前缓存当前内容,若回撤操作，则可使用保存的历史记录直接恢复
