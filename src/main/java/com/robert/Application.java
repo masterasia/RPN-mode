@@ -19,6 +19,8 @@ import com.robert.stack.OrderAnalysis;
  * 使用命令 exit 可退出计算器
  * 运算过程如遇小数，则保留15位
  * 结果集展示，如小数部分超出10位，仅保留10位
+ * 每轮输入一行命令，计算器逐词解析、执行，若遇见错误命令，则该轮执行结束
+ * 重新输入可继续紧接上轮错误命令前内容执行
  *
  * @author Robert.XU <xutao@bjnja.com>
  * @version RPN-mode, 2018/10/18 0018
