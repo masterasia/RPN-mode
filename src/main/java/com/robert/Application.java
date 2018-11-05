@@ -7,7 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
-import com.robert.stack.RPNCalculator;
+import com.robert.stack.OrderAnalysis;
 
 /**
  * RPN 计算器
@@ -27,7 +27,7 @@ import com.robert.stack.RPNCalculator;
 public class Application {
 
     @Autowired
-    private RPNCalculator rpnStack;
+    private OrderAnalysis orderAnalysis;
 
     /**
      * 执行入口
@@ -48,8 +48,8 @@ public class Application {
             if (readLine.equals("exit")) {
                 runnerFlag = false;
             } else {
-                rpnStack.unpackOrder(readLine);
-                rpnStack.print();
+                orderAnalysis.unpackOrder(readLine);
+                orderAnalysis.print();
             }
         }
     }

@@ -60,56 +60,6 @@ public class RPNCalculator implements Constant {
     private Boolean error = false;
 
     /**
-     * 待读取、分解的字符串
-     */
-    private String raw;
-
-    /**
-     * 待处理字符串长度
-     */
-    private int l = 0;
-
-    /**
-     * 游标，标识当前读取到字符串的位置
-     */
-    private int i = 0;
-
-    /**
-     * 最后一个读取到的词组
-     */
-    private String word;
-
-
-    /**
-     * 接收待处理命令
-     * 分析待处理命令
-     *
-     * @param raw 待处理命令
-     */
-    public void unpackOrder(String raw) {
-        logger.info("unpack input begin: {}", raw);
-        this.raw = raw;
-        i = 0;
-        l = raw.length();
-        try {
-            error = false;
-            this.decode();
-        } catch (RPNException e) {
-            System.out.println(e.getMessage());
-            logger.error(e.getMessage());
-        }
-        logger.info("unpack input end.");
-    }
-
-    /**
-     * 打印结果集信息
-     */
-    public void print() {
-        logger.info("print rpn stack: {}", stack.toString());
-        System.out.println(stack.toString());
-    }
-
-    /**
      * 清除计算器
      */
     public void removeAll() {
@@ -143,7 +93,7 @@ public class RPNCalculator implements Constant {
     }
 
     /**
-     * 标记异常
+     * 标记异常-操作步骤有误
      */
     public void isError() {
         error = true;
@@ -163,54 +113,29 @@ public class RPNCalculator implements Constant {
      *
      * @throws RPNException 解析异常
      */
-    private void decode() throws RPNException {
-        while (i < l && !error) {
-            // 获取下一个词
-            getWord();
-
-            if (word.isEmpty()) {
-                continue;
-            }
-
-            // 判断词是否为已注册的操作命令
-            if (operationMap.containsKey(word)) {
-                changed = true;
-                notifyObservers(word);
-            } else {
-                try {
-                    // 判断词是否为数字
-                    BigDecimal bigDecimal = new BigDecimal(word);
-                    logger.info(" find a number , {}", bigDecimal);
-                    save();
-                    stack.push(bigDecimal.toString());
-                } catch (NumberFormatException e) {
-                    // 非数字且为未注册命令，则抛出异常
-                    logger.error(" wrong input : {}", word);
-                    error = true;
-                }
+    public void receiveOrder(String order) throws RPNException {
+        error = false;
+        // 判断词是否为已注册的操作命令
+        if (operationMap.containsKey(order)) {
+            changed = true;
+            notifyObservers(order);
+        } else {
+            try {
+                // 判断词是否为数字
+                BigDecimal bigDecimal = new BigDecimal(order);
+                logger.info(" find a number , {}", bigDecimal);
+                save();
+                stack.push(bigDecimal.toString());
+            } catch (NumberFormatException e) {
+                // 非数字且为未注册命令，则抛出异常
+                logger.error(" wrong input : {}", order);
+                throw new RPNException();
             }
         }
 
         if (error) {
-            throw new RPNException(String.format(ERROR_MESSAGE, word, i == l ? i - word.length() + 1 : i - word.length()));
+            throw new RPNException();
         }
-    }
-
-    /**
-     * 读取下一个词组
-     */
-    private void getWord() {
-        StringBuilder wordTemp = new StringBuilder();
-        while (i < l) {
-            // 读取当前字符
-            char c = raw.charAt(i++);
-            // 遇见空格则组词完毕
-            if (Character.isSpaceChar(c)) {
-                break;
-            }
-            wordTemp.append(c);
-        }
-        word = wordTemp.toString();
     }
 
     /**

@@ -12,6 +12,9 @@ public class RPNException extends Exception {
      */
     private int code;
 
+    public RPNException() {
+    }
+
     public RPNException(String message, int code) {
         super(message);
     }
