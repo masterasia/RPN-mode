@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="project-base-init-create-schedule-01" author="who am I?">
+        <!-- qrtz_job_details表 -->
+        <createTable tableName="QRTZ_JOB_DETAILS" remarks="qrtz job details">
+            <column name="sched_name" type="varchar(120)" remarks="sched name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_name" type="varchar(200)" remarks="job name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_group" type="varchar(200)" remarks="job group">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(250)" remarks="description"/>
+            <column name="job_class_name" type="varchar(250)" remarks="job class name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_durable" type="varchar(5)" remarks="is durable">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_nonconcurrent" type="varchar(5)" remarks="is nonconcurrent">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_update_data" type="varchar(5)" remarks="is update data">
+                <constraints nullable="false"/>
+            </column>
+            <column name="requests_recovery" type="varchar(5)" remarks="requests recovery">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_data" type="blob" remarks="job data"/>
+        </createTable>
+        
+        <!-- qrtz_triggers -->
+        <createTable tableName="QRTZ_TRIGGERS" remarks="">
+            <column name="sched_name" type="varchar(120)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_name" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_group" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_name" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_group" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(250)"/>
+            <column name="next_fire_time" type="decimal(13)"/>
+            <column name="prev_fire_time" type="decimal(13)"/>
+            <column name="priority" type="decimal(13)"/>
+            <column name="trigger_state" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_type" type="varchar(8)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="decimal(13)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="decimal(13)"/>
+            <column name="calendar_name" type="varchar(200)"/>
+            <column name="misfire_instr" type="decimal(2)"/>
+            <column name="job_data" type="blob"/>
+        </createTable>
+        
+        <!-- 创建外键-->
+<!--         <addForeignKeyConstraint baseTableName="qrtz_triggers" -->
+<!--                                  baseColumnNames="sched_name, job_name, job_group" -->
+<!--                                  constraintName="fk_qrtz_triggers" -->
+<!--                                  referencedTableName="qrtz_job_details" -->
+<!--                                  referencedColumnNames="sched_name, job_name, job_group"/> -->
+        <!-- qrtz_blob_triggers表 -->
+        <createTable tableName="QRTZ_BLOB_TRIGGERS" remarks="qrtz blob triggers">
+            <column name="sched_name" type="varchar(120)" remarks="sched name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_name" type="varchar(200)" remarks="trigger name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_group" type="varchar(200)" remarks="trigger group">
+                <constraints nullable="false"/>
+            </column>
+            <column name="blob_data" type="blob" remarks="blob data"/>
+        </createTable>
+<!--         <addForeignKeyConstraint baseTableName="qrtz_blob_triggers" -->
+<!--                                  baseColumnNames="sched_name,trigger_name,trigger_group" -->
+<!--                                  constraintName="fk_qrtz_blob_triggers" -->
+<!--                                  referencedTableName="qrtz_triggers" -->
+<!--                                  referencedColumnNames="sched_name,trigger_name,trigger_group"/> -->
+        <!-- qrtz_calendars表 -->
+        <createTable tableName="QRTZ_CALENDARS" remarks="qrtz calendars">
+            <column name="sched_name" type="varchar(120)" remarks="sched name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="calendar_name" type="varchar(200)" remarks="calendar name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="calendar" type="blob" remarks="calendar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!-- qrtz_cron_triggers表 -->
+        <createTable tableName="QRTZ_CRON_TRIGGERS" remarks="qrtz cron triggers">
+            <column name="sched_name" type="varchar(120)" remarks="sched name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_name" type="varchar(200)" remarks="trigger name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_group" type="varchar(200)" remarks="trigger group">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cron_expression" type="varchar(120)" remarks="cron expression">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time_zone_id" type="varchar(80)" remarks="time zone id"/>
+        </createTable>
+<!--         <addForeignKeyConstraint baseTableName="qrtz_cron_triggers" -->
+<!--                                  baseColumnNames="sched_name, trigger_name, trigger_group" -->
+<!--                                  constraintName="fk_qrtz_cron_triggers" -->
+<!--                                  referencedTableName="qrtz_triggers" -->
+<!--                                  referencedColumnNames="sched_name, trigger_name, trigger_group"/> -->
+        <!--qrtz_fired_triggers表 -->
+        <createTable tableName="QRTZ_FIRED_TRIGGERS" remarks="qrtz fired triggers">
+            <column name="sched_name" type="varchar(120)" remarks="sched name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entry_id" type="varchar(95)" remarks="entry id">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_name" type="varchar(200)" remarks="trigger name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_group" type="varchar(200)" remarks="trigger group">
+                <constraints nullable="false"/>
+            </column>
+            <column name="instance_name" type="varchar(200)" remarks="instance name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fired_time" type="decimal(13)" remarks="fired time">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sched_time" type="decimal(13)" remarks="sched time">
+                <constraints nullable="false"/>
+            </column>
+            <column name="priority" type="decimal(13)" remarks="priority">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="varchar(16)" remarks="state">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_name" type="varchar(200)" remarks="job name"/>
+            <column name="job_group" type="varchar(200)" remarks="job group"/>
+            <column name="is_nonconcurrent" type="varchar(5)" remarks="is nonconcurrent"/>
+            <column name="requests_recovery" type="varchar(5)" remarks="requests recovery"/>
+        </createTable>
+        
+        <!--qrtz_locks表 -->
+        <createTable tableName="QRTZ_LOCKS" remarks="qrtz locks">
+            <column name="sched_name" type="varchar(120)" remarks="sched name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lock_name" type="varchar(40)" remarks="lock name">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!--qrtz_paused_trigger_grps表 -->
+        <createTable tableName="QRTZ_PAUSED_TRIGGER_GRPS" remarks="qrtz paused trigger grps">
+            <column name="sched_name" type="varchar(120)" remarks="sched name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_group" type="varchar(200)" remarks="trigger group">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!--qrtz_scheduler_state表 -->
+        <createTable tableName="QRTZ_SCHEDULER_STATE" remarks="qrtz scheduler state">
+            <column name="sched_name" type="varchar(120)" remarks="sched name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="instance_name" type="varchar(200)" remarks="instance name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_checkin_time" type="decimal(13)" remarks="last checkin time">
+                <constraints nullable="false"/>
+            </column>
+            <column name="checkin_interval" type="decimal(13)" remarks="checkin interval">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!--qrtz_simple_triggers表 -->
+        <createTable tableName="QRTZ_SIMPLE_TRIGGERS" remarks="qrtz simple triggers">
+            <column name="sched_name" type="varchar(120)" remarks="sched name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_name" type="varchar(200)" remarks="trigger name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_group" type="varchar(200)" remarks="trigger group">
+                <constraints nullable="false"/>
+            </column>
+            <column name="repeat_count" type="decimal(7)" remarks="repeat count">
+                <constraints nullable="false"/>
+            </column>
+            <column name="repeat_interval" type="decimal(12)" remarks="repeat interval">
+                <constraints nullable="false"/>
+            </column>
+            <column name="times_triggered" type="decimal(10)" remarks="times triggered">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+<!--         <addForeignKeyConstraint baseColumnNames="sched_name, trigger_name, trigger_group" -->
+<!--                                  baseTableName="qrtz_simple_triggers" -->
+<!--                                  constraintName="fk_qrtz_simple_triggers" -->
+<!--                                  referencedColumnNames="sched_name, trigger_name, trigger_group" -->
+<!--                                  referencedTableName="qrtz_triggers"/> -->
+        <!--qrtz_simprop_triggers表 -->
+        <createTable tableName="QRTZ_SIMPROP_TRIGGERS" remarks="qrtz simprop triggers">
+            <column name="sched_name" type="varchar(120)" remarks="sched name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_name" type="varchar(200)" remarks="trigger name">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_group" type="varchar(200)" remarks="trigger group">
+                <constraints nullable="false"/>
+            </column>
+            <column name="str_prop_1" type="varchar(512)" remarks="str prop 1"/>
+            <column name="str_prop_2" type="varchar(512)" remarks="str prop 2"/>
+            <column name="str_prop_3" type="varchar(512)" remarks="str prop 3"/>
+            <column name="int_prop_1" type="decimal(10)" remarks="int prop 1"/>
+            <column name="int_prop_2" type="decimal(10)" remarks="int prop 2"/>
+            <column name="long_prop_1" type="decimal(13)" remarks="long prop 1"/>
+            <column name="long_prop_2" type="decimal(13)" remarks="long prop 2"/>
+            <column name="dec_prop_1" type="decimal(13,4)" remarks="dec prop 1"/>
+            <column name="dec_prop_2" type="decimal(13,4)" remarks="dec prop 2"/>
+            <column name="bool_prop_1" type="varchar(5)" remarks="bool prop 1"/>
+            <column name="bool_prop_2" type="varchar(5)" remarks="bool prop 2"/>
+        </createTable>
+<!--         <addForeignKeyConstraint baseColumnNames="sched_name, trigger_name, trigger_group" -->
+<!--                                  baseTableName="qrtz_simprop_triggers" -->
+<!--                                  constraintName="fk_qrtz_simprop_triggers" -->
+<!--                                  referencedColumnNames="sched_name, trigger_name, trigger_group" -->
+<!--                                  referencedTableName="qrtz_triggers"/> -->
+
+    </changeSet>
+    
+    <changeSet id="project-base-init-create-schedule-add-index" author="">
+		<sql splitStatements="true" stripComments="true">
+			CREATE UNIQUE INDEX PK_QRTZ_JOB_DETAILS ON QRTZ_JOB_DETAILS(SCHED_NAME, JOB_NAME, JOB_GROUP);
+			CREATE INDEX IDX_QRTZ_J_GRP ON QRTZ_JOB_DETAILS(SCHED_NAME, JOB_GROUP);
+			CREATE INDEX IDX_QRTZ_J_REQ_RECOVERY ON QRTZ_JOB_DETAILS(SCHED_NAME, REQUESTS_RECOVERY);
+
+			CREATE UNIQUE INDEX PK_QRTZ_TRIGGERS ON QRTZ_TRIGGERS(SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+			CREATE INDEX IDX_QRTZ_T_C ON QRTZ_TRIGGERS(SCHED_NAME, CALENDAR_NAME);
+			CREATE INDEX IDX_QRTZ_T_G ON QRTZ_TRIGGERS(SCHED_NAME, TRIGGER_GROUP);
+			CREATE INDEX IDX_QRTZ_T_J ON QRTZ_TRIGGERS(SCHED_NAME, JOB_NAME, JOB_GROUP);
+			CREATE INDEX IDX_QRTZ_T_JG ON QRTZ_TRIGGERS(SCHED_NAME, JOB_GROUP);
+			CREATE INDEX IDX_QRTZ_T_NEXT_FIRE_TIME ON QRTZ_TRIGGERS(SCHED_NAME, NEXT_FIRE_TIME);
+			CREATE INDEX IDX_QRTZ_T_NFT_MISFIRE ON QRTZ_TRIGGERS(SCHED_NAME, MISFIRE_INSTR, NEXT_FIRE_TIME);
+			CREATE INDEX IDX_QRTZ_T_NFT_ST ON QRTZ_TRIGGERS(SCHED_NAME, TRIGGER_STATE, NEXT_FIRE_TIME);
+			CREATE INDEX IDX_QRTZ_T_NFT_ST_MISFIRE ON QRTZ_TRIGGERS(SCHED_NAME, MISFIRE_INSTR, NEXT_FIRE_TIME, TRIGGER_STATE);
+			CREATE INDEX IDX_QRTZ_T_NFT_ST_MISFIRE_GRP ON QRTZ_TRIGGERS(SCHED_NAME, MISFIRE_INSTR, NEXT_FIRE_TIME, TRIGGER_GROUP, TRIGGER_STATE);
+			CREATE INDEX IDX_QRTZ_T_N_G_STATE ON QRTZ_TRIGGERS(SCHED_NAME, TRIGGER_GROUP, TRIGGER_STATE);
+			CREATE INDEX IDX_QRTZ_T_N_STATE ON QRTZ_TRIGGERS(SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP, TRIGGER_STATE);
+			CREATE INDEX IDX_QRTZ_T_STATE ON QRTZ_TRIGGERS(SCHED_NAME, TRIGGER_STATE);
+
+			CREATE UNIQUE INDEX PK_QRTZ_BLOB_TRIGGERS ON QRTZ_BLOB_TRIGGERS(SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+			CREATE UNIQUE INDEX PK_QRTZ_CALENDARS ON QRTZ_CALENDARS(SCHED_NAME, CALENDAR_NAME);
+			CREATE UNIQUE INDEX PK_QRTZ_CRON_TRIGGERS ON QRTZ_CRON_TRIGGERS(SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+
+			CREATE UNIQUE INDEX PK_QRTZ_FIRED_TRIGGERS ON QRTZ_FIRED_TRIGGERS(SCHED_NAME, ENTRY_ID);
+			CREATE INDEX IDX_QRTZ_FT_INST_JOB_REQ_RCVRY ON QRTZ_FIRED_TRIGGERS(SCHED_NAME, INSTANCE_NAME, REQUESTS_RECOVERY);
+			CREATE INDEX IDX_QRTZ_FT_JG ON QRTZ_FIRED_TRIGGERS(SCHED_NAME, JOB_GROUP);
+			CREATE INDEX IDX_QRTZ_FT_J_G ON QRTZ_FIRED_TRIGGERS(SCHED_NAME, JOB_NAME, JOB_GROUP);
+			CREATE INDEX IDX_QRTZ_FT_TG ON QRTZ_FIRED_TRIGGERS(SCHED_NAME, TRIGGER_GROUP);
+			CREATE INDEX IDX_QRTZ_FT_TRIG_INST_NAME ON QRTZ_FIRED_TRIGGERS(SCHED_NAME, INSTANCE_NAME);
+			CREATE INDEX IDX_QRTZ_FT_T_G ON QRTZ_FIRED_TRIGGERS(SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+
+			CREATE UNIQUE INDEX PK_QRTZ_LOCKS ON QRTZ_LOCKS(SCHED_NAME, LOCK_NAME);
+			CREATE UNIQUE INDEX PK_QRTZ_PAUSED_TRIGGER_GRPS ON QRTZ_PAUSED_TRIGGER_GRPS(SCHED_NAME, TRIGGER_GROUP);
+			CREATE UNIQUE INDEX PK_QRTZ_SCHEDULER_STATE ON QRTZ_SCHEDULER_STATE(SCHED_NAME, INSTANCE_NAME);
+			CREATE UNIQUE INDEX PK_QRTZ_SIMPLE_TRIGGERS ON QRTZ_SIMPLE_TRIGGERS(SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+			CREATE UNIQUE INDEX PK_QRTZ_SIMPROP_TRIGGERS ON QRTZ_SIMPROP_TRIGGERS(SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+		</sql>
+	</changeSet>
+</databaseChangeLog>
